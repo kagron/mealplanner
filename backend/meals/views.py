@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from mealplanner.meals.serializers import UserSerializer, GroupSerializer
+from meals.serializers import UserSerializer, GroupSerializer
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
     """
