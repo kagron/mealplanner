@@ -24,7 +24,7 @@ matrix:
       install:
         - docker-compose build
       script:
-        - docker-compose exec djangoapp python ./manage.py test meals
+        - docker-compose run djangoapp python ./manage.py test meals
       after_script:
         - docker-compose rm -s -f
       
