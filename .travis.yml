@@ -21,6 +21,8 @@ matrix:
         - sudo mv docker-compose /usr/local/bin
         # Config options
         - cp config/db/envexample config/db/database1_env
+        - sed 's/user/database1_role/' config/db/database1_env
+        - sed 's/password/database1_password/' config/db/database1_env
       install:
         - docker-compose build
       script:
