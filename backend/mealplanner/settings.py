@@ -38,8 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'meals.apps.MealsConfig'
+    'meals.apps.MealsConfig',
+    'graphene_django',
+    "django_filters"
 ]
+
+GRAPHENE = {
+    'SCHEMA': 'mealplanner.schema.schema'
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
