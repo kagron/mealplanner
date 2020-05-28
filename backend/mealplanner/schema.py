@@ -9,4 +9,10 @@ class Query(
 ):
     debug = graphene.Field(DjangoDebug, name="_debug")
 
-schema = graphene.Schema(query=Query)
+class Mutation(
+    meals.schema.Mutation,
+    graphene.ObjectType
+):
+    debug: graphene.Field(DjangoDebug, name="__debug")
+
+schema = graphene.Schema(query=Query, mutation=Mutation)

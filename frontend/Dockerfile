@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:14
 ENV NPM_CONFIG_LOGLEVEL warn
 ENV NODE_ENV=development PORT=3000
 RUN mkdir -p /code/frontend/cache
