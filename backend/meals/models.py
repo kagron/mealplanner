@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
+import django
 
 class BaseModel(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -19,11 +19,11 @@ class Meal(BaseModel):
         (DINNER, "Dinner")
     )
     time_of_day = models.CharField(choices=TIMES_OF_DAY, max_length=100)
-    day = models.DateField(default=timezone.now())
+    day = models.DateField(default=django.utils.timezone.now())
     user = models.ForeignKey(User, on_delete=models.CASCADE)
  
     def __str__(self):
-        return str(self.get_time_of_day_display()) + " on " + self.day.strftime("%B %d, %Y")
+        return str(self.user.username + "'s " + self.get_time_of_day_display()) + " on " + self.day.strftime("%B %d, %Y")
 
 
 class Food(BaseModel):
