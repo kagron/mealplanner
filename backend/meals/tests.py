@@ -41,5 +41,5 @@ class MealModelTests(TestCase):
         logger.info(meals)
         self.assertQuerysetEqual(
             meals,
-            ['<Meal: Breakfast on January 01, 2017>']
+            ['<Meal: Kyle\'s Breakfast on January 01, 2017>']
         )
