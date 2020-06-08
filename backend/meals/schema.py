@@ -1,134 +1,64 @@
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
-from graphene import ObjectType, String, Mutation, Enum, DateTime, Int, relay, Field, resolve_only_args
 from graphql_relay import from_global_id
 from meals.models import Meal, Food, Favorite
 from django.contrib.auth.models import User
 from django.utils import timezone
 import django_filters
+import graphene
+
+class TimesOfDayEnum(graphene.Enum):
+    breakfast = Meal.BREAKFAST
+    lunch     = Meal.LUNCH
+    dinner    = Meal.DINNER
 
 class MealNode(DjangoObjectType):
     class Meta:
         model = Meal
-        interfaces = (relay.Node,)
-        filter_fields = ['time_of_day', 'day']
 
-    @classmethod
-    def get_node(cls, info, id):
-        return Meal.objects.get(pk=id)
+class AddMealMutation(graphene.Mutation):
+    class Arguments:
+        day         = graphene.Date()
+        time_of_day = TimesOfDayEnum()
+        user        = graphene.Int(required=True)
 
-class AddMealMutation(relay.ClientIDMutation):
-    class Input:
-        day = DateTime()
-        user = Int()
-        # time_of_day = Enum.from_enum(enum=Meal.TIMES_OF_DAY)
-    
-    meal = Field(MealNode)
+    meal = graphene.Field(MealNode)
 
-    @classmethod
-    def mutate_and_get_payload(
-        self,
-        root,
-        info,
-        day,
-        user,
-        client_mutation_id=None
-    ):
-        created = timezone.now()
-        updated = timezone.now()
+    def mutate(self, info, day, time_of_day, user):
         userObj = User.objects.get(pk=user)
-        new_meal = Meal.objects.create(
-            time_of_day="lunch",
-            created=created, 
-            updated=updated, 
-            day=day,
-            user=userObj
+        meal    = Meal.objects.create(
+            time_of_day = time_of_day,
+            day         = day,
+            created     = timezone.now(),
+            updated     = timezone.now(),
+            user        = userObj
         )
-        return AddMealMutation(meal=new_meal)
+        return AddMealMutation(meal=meal)
 
 class FoodNode(DjangoObjectType):
     class Meta:
         model = Food
-        interfaces = (relay.Node,)
-        filter_fields = ["meal"]
-    
-    # @classmethod
-    # def get_node(cls, info, id):
-    #     print("HELLLOOOOOO")
-    #     return Food.objects.get(pk=id)
-
-
-class AddFoodMutation(relay.ClientIDMutation):
-    class Input:
-        meal = Int()
-        description = String()
-        calories = Int()
-    
-    food = Field(FoodNode)
-
-    @classmethod
-    def mutate_and_get_payload(
-        self,
-        root,
-        info,
-        meal,
-        description,
-        calories,
-        client_mutation_id=None
-    ):
-        created = timezone.now()
-        updated = timezone.now()
-        new_food = Food.objects.create(
-            meal=meal,
-            created=created, 
-            updated=updated, 
-            description=description,
-            calories=calories
-        )
-        return AddFoodMutation(food=new_food)
 
 class FavoriteNode(DjangoObjectType):
     class Meta:
         model = Favorite
-        interfaces = (relay.Node,)
-        filter_fields = ["user"]
-            
-    @classmethod
-    def get_node(cls, info, id):
-        return Favorite.objects.get(pk=id)
 
 class UserNode(DjangoObjectType):
     class Meta:
         model = User
-        interfaces = (relay.Node,)
-        filter_fields = ["username"]
-         
-    @classmethod
-    def get_node(cls, info, user_id):
-        print("HELLLOOOOOO")
-        print(user_id)
-        return User.objects.get(id=user_id)
 
-class Query(ObjectType):
-    node = relay.Node.Field()
-    meal = relay.Node.Field(MealNode, meal_id=Int())
-    all_meals = DjangoFilterConnectionField(MealNode)
+class Query(graphene.ObjectType):
+    all_meals     = graphene.List(MealNode)
+    def resolve_all_meals(self, info, **kwargs):
+        return Meal.objects.all()
 
-    food = relay.Node.Field(FoodNode, food_id=Int())
-    all_food = DjangoFilterConnectionField(FoodNode)
+    all_food      = graphene.List(FoodNode)
 
-    favorites = relay.Node.Field(FavoriteNode)
-    all_favorites = DjangoFilterConnectionField(FavoriteNode)
+    all_favorites = graphene.List(FavoriteNode)
 
-    users = relay.Node.Field(UserNode)
-    user = relay.Node.Field(UserNode, user_id=Int())
-    all_users = DjangoFilterConnectionField(UserNode)
+    all_users     = graphene.List(UserNode)
 
-    @resolve_only_args
-    def resolve_user(self, user_id):
-        return User.objects.get(id=user_id)
-
-class Mutation(ObjectType):
+class Mutation(graphene.ObjectType):
     add_meal = AddMealMutation.Field()
-    add_food_to_meal = AddFoodMutation.Field()
+
     

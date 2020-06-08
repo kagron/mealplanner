@@ -10,9 +10,9 @@ class BaseModel(models.Model):
         abstract = True
 
 class Meal(BaseModel):
-    BREAKFAST = "breakfast"
-    LUNCH = "lunch"
-    DINNER = "dinner"
+    BREAKFAST    = "breakfast"
+    LUNCH        = "lunch"
+    DINNER       = "dinner"
     TIMES_OF_DAY = (
         (BREAKFAST, "Breakfast"),
         (LUNCH, "Lunch"),
