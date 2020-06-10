@@ -11,8 +11,8 @@ const LOGIN = gql`
 `;
 
 const REFRESH = gql`
-    mutation tokenAuth($username: String!, $password: String!) {
-        tokenAuth(username: $username, password: $password) {
+    mutation refreshToken($token: String!) {
+        refreshToken(token: $token) {
             token
             payload
             refreshExpiresIn

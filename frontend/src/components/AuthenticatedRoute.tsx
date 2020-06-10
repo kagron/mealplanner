@@ -14,6 +14,7 @@ import { Container, makeStyles } from '@material-ui/core';
 
 // Notistack
 import { useSnackbar } from 'notistack';
+import useAuthQuery from '../graphql/useAuthQuery';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -26,7 +27,9 @@ const useStyles = makeStyles((theme) => ({
 
 const AuthenticatedRoute = (props: RouteProps) => {
     const classes = useStyles();
-    const { loading, error, data } = useQuery<User>(GET_USER);
+    const { loading, error, data } = useAuthQuery<User>(GET_USER, {
+        fetchPolicy: 'no-cache',
+    });
     const { enqueueSnackbar } = useSnackbar();
     if (error) {
         console.error(error);

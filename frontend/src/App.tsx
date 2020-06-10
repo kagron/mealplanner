@@ -46,11 +46,14 @@ const theme = createMuiTheme({
 
 const App: React.FC = () => {
     const csrfToken = Cookies.get('csrftoken');
-    const currentUser = localStorage.getItem(CURRENT_USER);
     const client = new ApolloClient({
-        headers: {
-            // 'X-CSRFToken': csrfToken,
-            ...(currentUser ? { Authorization: `JWT ${currentUser}` } : undefined),
+        request: (operation) => {
+            const currentUser = localStorage.getItem(CURRENT_USER);
+            operation.setContext({
+                headers: {
+                    ...(currentUser ? { Authorization: `JWT ${currentUser}` } : undefined),
+                },
+            });
         },
     });
     return (

@@ -17,34 +17,28 @@ const useAuthQuery: typeof useQuery = (...args) => {
         ? JSON.parse(preParseCurrentUserInfo)
         : null;
     const now = moment().unix();
-    const [refresh, { loading, error, data }] = useMutation<TokenAuth, { username: string; password: string }>(
-        REFRESH,
-        {
-            onCompleted: (data) => {
-                if (data && data.tokenAuth && data.tokenAuth.token) {
-                    localStorage.setItem(CURRENT_USER, data.tokenAuth.token);
-                    localStorage.setItem(CURRENT_USER_INFO, JSON.stringify(data.tokenAuth));
-                    window.location.pathname = '/';
-                }
-            },
-            onError: (error) => {
-                if (error) {
-                    console.error(error);
-                }
-            },
-        }
-    );
+    const [refresh, { loading, error, data }] = useMutation<TokenAuth, { token: string }>(REFRESH, {
+        onCompleted: (data) => {
+            if (data && data.tokenAuth && data.tokenAuth.token) {
+                localStorage.setItem(CURRENT_USER, data.tokenAuth.token);
+                localStorage.setItem(CURRENT_USER_INFO, JSON.stringify(data.tokenAuth));
+            }
+        },
+        onError: (error) => {
+            if (error) {
+                console.error(error);
+            }
+        },
+    });
 
-    if (
-        !currentUser ||
-        !currentUserInfo ||
-        !currentUserInfo.payload ||
-        !currentUserInfo.payload.exp ||
-        now >= currentUserInfo.payload.exp
-    ) {
-        console.info('need to refresh');
-        console.info('need to refresh');
-        refresh();
+    if (!loading) {
+        if (now >= currentUserInfo!.payload!.exp!) {
+            console.log('refreshing token');
+            refresh({ variables: { token: currentUser! } });
+        } else if (now >= currentUserInfo!.refreshExpiresIn!) {
+            localStorage.removeItem(CURRENT_USER);
+            localStorage.removeItem(CURRENT_USER_INFO);
+        }
     }
     return useQuery(...args);
 };

@@ -78,7 +78,8 @@ const Login = (props: RouteComponentProps) => {
                 // });
                 localStorage.setItem(CURRENT_USER, data.tokenAuth.token);
                 localStorage.setItem(CURRENT_USER_INFO, JSON.stringify(data.tokenAuth));
-                window.location.pathname = '/';
+                // window.location.pathname = '/';
+                props.history.push('/');
             }
         },
         onError: (error) => {
